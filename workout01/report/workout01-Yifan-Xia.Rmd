@@ -5,3 +5,142 @@ date: "2019/3/9"
 output: github_document
 ---
 
+
+```{r}
+library(dplyr)
+library(grid)
+library(readr)
+shots_data <- read.csv(file ='/Users/mac/Desktop/hw-stat133/workout01/data/shots-data.csv')
+```
+
+####Introduction: 
+
+I am not a fan of the Warriors, but I want to know what is the reason for it to continue to create brilliance. There must be a reason behind this. Everyone has their own opinions, but I don't think the data will lie. I want to use data to analyze the reasons behind the success of the Golden State Warriors.\
+\
+
+
+####Background：
+
+The Golden State Warriors is a professional basketball team belonging to California. It was one of the first teams to join the NBA and it was also the first team to win the championship.
+In the 2015-16 season, the Warriors had 73 wins and 9 losses in the regular season and that was the best single regular season record in the NBA history. The data I used this time came from the season after that.On June 13, 2017, the Warriors surpassed the 2000-01 Lakers (15 wins and 1 loss) record with a 16 wins and 1 loss in the playoffs, becoming the highest winning team in NBA history.\
+\
+
+
+####Data:
+
+This data includes all the shots of the five players in 2016-2017 season. Contains data such as player's name, shotting position, time remaining, shot action type, shot type, whether they made it and the opponent team. All data are of type character, integer,and factor.\
+\
+
+
+####Analysis:
+
+The first table is a summary of their two point shots
+```{r}
+#two points
+two_pt <- filter(shots_data,shot_type == '2PT Field Goal')
+two_pt %>%
+  group_by(name) %>%
+  summarise(
+    total = length(name),
+    made = length(shot_made_flag[shot_made_flag == "shot_yes"]),
+    perc_made = made/total) %>%
+  arrange(desc(perc_made))
+```
+The second table is a summary of their three point shots
+```{r}
+#three points
+three_pt <- filter(shots_data,shot_type == '3PT Field Goal')
+three_pt %>%
+  group_by(name) %>%
+  summarise(
+    total = length(name),
+    made = length(shot_made_flag[shot_made_flag == "shot_yes"]),
+    perc_made = made/total) %>%
+  arrange(desc(perc_made))
+```
+The third table is a summary of their total shots
+```{r out.width='80%',echo=FALSE,fig.align='center'}
+knitr::include_graphics('/Users/mac/Desktop/hw-stat133/workout01/images/gsw-shot-charts.png')
+```
+
+```{r}
+#total
+shots_data %>%
+  group_by(name) %>%
+  summarise(
+    total = length(name),
+    made = length(shot_made_flag[shot_made_flag == "shot_yes"]),
+    perc_made = made/total) %>%
+  arrange(desc(perc_made))
+```
+Kevin Durant didn’t play for Warriors until this season. We can see from these three tables that he is a player with excellent data. Whether it is a two-pointer or a three-pointer, his accuracy is very good. Another outstanding player in the tea is Curry, who is a famous scoring weapon. In particular, his three-pointer has a better accuracy compared to the league's average for the season, which gives the Warriors a considerable advantage. In addition to these two people, the remaining three are also comprehensive players. They all have their own scoring methods, so they became the regular starting lineup of the Warriors this season.\
+
+In addition to the accuracy of pitching, we can also analyze the performance of this season from other aspects, such as the time when they scored. I made an table of shots made each period and sorted by made shots. We can see that in the first two periods, their total number of shots is significantly higher than the last two periods. The last period has the least number of shots and lowest accuracy, which may be due to physical exertion or tactical arrangement. For example, in the case of a relatively large win, they might try to protect the players and prevent them from being too tired or injured in the last period. 
+
+```{r}
+#Shots in each period
+shots_data %>%
+  group_by(period) %>%
+  summarise(
+    made = length(shot_made_flag[shot_made_flag == "shot_yes"]),
+    total = length(name),
+    perc_made = made/total)%>%
+  arrange(desc(made))
+```
+Analysis of opponents is also a very effective way to help the team improve their performance. I made a table of Warriors for the shot made rate against different teams. As can be seen from the table, when playing against Dallas Mavericks, the shot made rate is 16% higher than playing against Brooklyn Nets, yet the number of total shots is not so different. Using our existing data is not enough to find out why this is happening, but at least it indicates that when they are playing against a team like Brooklyn nets, their strategy may need to be adjusted.
+
+```{r}
+# by oppoent
+opponent_made <- shots_data %>%
+  group_by(opponent) %>%
+  summarise(
+    made = length(shot_made_flag[shot_made_flag == "shot_yes"]),
+    total = length(name),
+    perc_made = made/total) %>%
+  arrange(desc(perc_made))
+opponent_made
+```
+In addition to the above tables, one of the existing data is the action of each shot. The player's choice to shoot with some action does not depend on the success rate of that action. In general, the choice of action is subconscious, a habit that has accumulated over many years of training.
+
+```{r}
+#by action type
+action_made <- shots_data %>%
+  group_by(action_type) %>%
+  summarise(
+    made = length(shot_made_flag[shot_made_flag == "shot_yes"]),
+    total = length(name),
+    perc_made = made/total)%>%
+  arrange(desc(made))
+action_made
+```
+There are total 46 different types of actions that the players use in 2016-2017 seasons! From the table we can clearly see that the most used action is jump shot. So I made another table to separate the jump shot of the two-pointer and the three-pointer.
+```{r}
+type <- filter(shots_data,action_type=='Jump Shot' )%>%
+  group_by(name) %>%
+  summarise(
+    three_pt = length(shot_type[shot_type == "3PT Field Goal"]),
+    two_pt = length(shot_type[shot_type == "2PT Field Goal"]),
+    two_three_perc = three_pt/two_pt,
+    total = length(name))%>%
+  arrange(desc(total))
+type
+```
+Jump shots outside the three-point line are significantly more than at the two-point line. The largest percentage comes from Curry. His three-point line jump shots is over four times more than his two-point line jump shots. This also reflects his expertise in shooting three-pointers.\
+\
+
+
+####Conclusion:
+
+Compared to all the data in a game, we have only a small part. But even with a small amount of data, we can still find some interesting discoveries. For example, I didn’t know that there were so many different shot actions being used before doing this analysis. The record of these actions, if can add more players' physical data, can be used to analyze a player's playing habits. Before the player makes an action, others can use these data to predict what he will do next. This will be a great help for targeted defense. Another example is, when we have a scatter plot of the player's pitch position, we can use it to analyze whether the player is not confident shooting at a certain angle, so the coaching group can be more clear about what the player needs.
+Overall, this analysis gives me a preliminary understanding of the five players of the Warriors. After seeing their data, I start to understand why this team can win three championships within four years. I believe that in addition to the excellent data, the team’s culture is another factor that makes this team so successful. Three of the five who were looked down by other people. But they are now the best players in the league and just play great games together with their most energy. Everyone is enjoying basketball, enjoying the happiness and promotion of self-worth. Everyone has found themselves in this team, and is willing to sacrifice myself for their teammates. As Greg Thomas said in an interview with Forbes: “a team is like a living organism. It needs to be touched every day, watered, and fed. That’s very relevant in what we do. It’s our responsibility to build a place where people feel cared about at work beyond their job. Where it’s not just a slogan on the wall. It’s having leaders in place that are motivational and inspiring to people. It’s also about connecting with people in an authentic way, which includes having hard conversations.”\
+\
+
+
+####Reference:
+
+* "Golden State Warriors.” Wikipedia, Wikimedia Foundation, 10 Mar. 2019, en.wikipedia.org/wiki/Golden_State_Warriors.
+\
+* Contributor, Workday. “Golden State Warriors GM Bob Myers on Culture, Leadership, and Authenticity.” Forbes, Forbes Magazine, 11 Jan. 2019, www.forbes.com/sites/workday/2019/01/11/golden-state-warriors-gm-bob-myers-on-culture-leadership-and-authenticity/#7801e3587bdc.
+
+
+
