@@ -1,0 +1,22 @@
+## ----echo = FALSE, message= FALSE----------------------------------------
+knitr::opts_chunk$set(collapse = T, comment="#>")
+library(Binomial)
+library(ggplot2)
+
+## ------------------------------------------------------------------------
+#ways of having 3 success in 5 trials
+bin_choose(trials=5,success=3)
+
+## ------------------------------------------------------------------------
+#probability of having 3 success in 5 trials
+bin_probability(success=3,trials=5,prob=0.5)
+
+## ------------------------------------------------------------------------
+#dis_table <- bin_distribution(trials = 5, prob = 0.5)
+#plot.bindis(dis_table)
+
+
+## ------------------------------------------------------------------------
+#cum_table <- bin_cumulative(trials=5, prob=0.5)
+#plot.bincum(cum_table)
+

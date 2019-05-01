@@ -1,0 +1,357 @@
+---
+title: "soln hw 10"
+author: ""
+date: ""
+output: 
+  html_document:
+    fig_height: 3
+    fig_width: 5
+---
+<!-- Don't edit in between this line and the one below -->
+```{r include=FALSE}
+# Don't delete this chunk if you are using the DataComputing package
+library(DataComputing)
+```
+*Source file* 
+```{r, results='asis', echo=FALSE}
+includeSourceDocuments()
+```
+<!-- Don't edit the material above this line -->
+
+#Problem 10A
+##part a
+Our data is:
+```{r}
+df <- read.table("/Users/Adam/Desktop/Stat135_F17/hw10/hw10soln/chicks.txt",header = TRUE)
+df
+```
+
+The standard regression model is: \[cw_i=\beta_0+\beta_1 el_i +e_i,\]
+
+where $cw_i$ is the weight of the $i$th chick and $el_i$ is the length of the egg from which it hatched, and $e_i$ the normal error.
+
+We plot the data:
+
+```{r}
+df %>% ggplot(aes(y=cw,x=el)) +geom_point()
+```
+
+The plot looks linear and roughly (though not perfectly) homoscedastic. I’m willing to believe that the model is OK.
+
+We find the mean and correlation of the two variables.
+```{r}
+mean(df$cw)
+mean(df$el)
+cor(df$cw,df$el)
+```
+
+We find the slope and the intercept of the regression line. The units of the slope are grams per millimeter and the units for the intercept is grams.
+
+```{r}
+slope<- cov(df$cw,df$el)/var(df$el)
+slope
+intercept <- mean(df$cw)-mean(df$el)*slope
+intercept
+```
+
+The regression equation is 
+\[\hat{y}=0.25 x -1.77\]
+
+Next we draw the regression line:
+
+```{r}
+df %>% ggplot(aes(y=cw,x=el)) +geom_point() + geom_abline(slope=.25,intercept=-1.77)
+```
+
+##part b
+
+We use the function `lm()` and `geom_smooth()`
+```{r}
+
+reg <- lm(formula=df$cw~df$el)
+summary(reg)
+
+df %>% ggplot(aes(y=cw,x=el))+ geom_point() + geom_smooth(method=lm,se=FALSE)
+
+```
+
+According to R the slope of the regression line is 0.2522 and the intercept is -1.7702, both of which agree with the values computed in a. Assuming that the linear model holds, the t-test for the intercept is testing whether or not the intercept of the true line is 0; the p-value is large (19%) which supports the null hypothesis that the intercept is 0.
+In this case (simple regression) the t-test for the slope and the F-test are both testing the same thing: whether or not the slope is 0. Both reject the hypothesis that the slope is 0. I hope you noticed that the F -statistic of 35.37 is the square of the t-statistics of 5.947.
+
+
+## part c
+
+We check which which of three variables is most highly correlated with `cw` using `cor`.
+```{r}
+cor(df)
+```
+
+Not surprisingly, it’s egg weight. The correlation between the weights of the eggs and the chicks is 0.847225.
+
+```{r}
+df %>% ggplot(aes(y=cw,x=ew))+ geom_point() + geom_smooth(method=lm,se=FALSE)
+ggplot(lm(df$cw~df$ew)) + geom_point(aes(x=.fitted,y=.resid))
+```
+
+The plot is nice and linear but heteroscedasticity is an issue at the edges. The assumptions of the linear model are not terrible for the main bulk of the data. The residual plot shows the same thing. 
+
+We also look at the normal quantile plot of the residuals to see if the residuals are approx normal.
+```{r}
+reg <- lm(df$cw~(df$ew))
+qqnorm(reg$residuals)
+```
+
+Normality of the residuals looks ok.
+
+## part d
+We estimate $\sigma^2$ by RSS/(n-2) which is reported as residual standard error with 42 df on the summary of the `lm()`
+```{r}
+reg <- lm(df$cw~df$ew)
+summary(reg)
+coeff <- coefficients(reg)
+```
+
+We see the residual standard error is $0.2207$.
+
+```{r}
+n <- length(df$cw)
+se <- .2207*sqrt(1/n + (8.5-mean(df$ew))^2/((n-1)*var(df$ew)))
+se
+```
+
+The predicted weight is:
+
+```{r}
+pred_weight <- coeff[1]+coeff[2]*8.5
+pred_weight
+```
+
+Then 95% CI for chick weight with 8.5g egg weight is:
+```{r}
+CI <- c(pred_weight - qt(.975,df=42)*se,pred_weight+qt(.975,df=42)*se)
+CI
+a <- df$ew
+
+#or you can use predict()
+reg <- lm(df$cw~a)
+newdata <- data.frame(a=8.5)
+predict(reg,newdata,interval="confidence")
+```
+
+## part e
+The estimate is the same as in part d and so is the value of t, but now the standard error is: 
+```{r}
+se_chick_wt <- .2207*sqrt(1+ 1/n + (8.5-mean(df$ew))^2/((n-1)*var(df$ew)))
+se_chick_wt
+
+```
+
+Then the PI is given by:
+
+```{r}
+actual_weight=5.8
+PI <- c(pred_weight - qt(.975,df=42)*se_chick_wt,actual_weight+qt(.975,df=42)*se_chick_wt)
+PI
+
+se <- .2207*sqrt(1/n + (8.5-mean(df$ew))^2/((n-1)*var(df$ew))+1)
+se
+CI <- c(pred_weight - qt(.975,df=42)*se,pred_weight+qt(.975,df=42)*se)
+CI
+```
+
+
+## part f
+The given egg weight is well outside the range of the data. I don’t know whether the model holds at those weights or not. So, because we are dealing with such an outlier, I will declare this one to be “not possible”.
+In general, beware of “extrapolation”, that is, making estimates outside the range of your data. Unless you really have reason to believe that the model continues to hold even in where you have no observations, don’t do it.
+
+# Problem 10B
+
+##part a
+
+We regress chick weight on egg breadth and egg length.
+
+```{r}
+reg <- lm(df$cw~df$eb+df$el)
+summary(reg)
+```
+
+
+```{r}
+ggplot(lm(df$cw~(df$el+df$eb))) + geom_point(aes(x=.fitted,y=.resid))
+```
+
+
+```{r}
+reg_mult <- lm(df$cw~(df$ew+df$eb))
+qqnorm(reg_mult$residuals)
+
+```
+
+The two regressions are very similar. Both show the same problems with the homoscedas- ticity assumptions. Both have an $R^2$ of about 0.71. The normal quantile plot is worse for the
+multiple regression. But overall, not much to choose between them.
+
+#part b
+
+We regress egg weight on egg breadth and egg length.
+
+
+
+```{r}
+reg <- lm(df$ew~df$eb+df$el)
+summary(reg)
+```
+
+The $R^2$ is an astonishing 0.95. So you can think of egg weight as essentially a linear function of egg length and egg breadth. That explains why the two regressions in a are so similar: linear functions of egg weight are essentially linear functions of egg length and egg breadth (i.e. cw\~ew is essentially the same as cw\~eb+el since ew is a linear combination of eb and el.)
+
+##part c
+
+
+```{r}
+reg <- lm(df$cw~df$eb+df$el+ df$ew)
+summary(reg)
+
+```
+
+Given the discussion in part b), this is a really silly thing to do. And the silliness shows up in the apparently contradictory results of the F-test and the three t-tests for the slopes. Each t-test concludes that the corresponding slope is 0, but the F-test concludes that not all are 0. It’s all correct! The predictor variables are so highly correlated with each other (see e.g. part b) that the individual slopes have no meaning. More precisely,
+the standard error each of the coefficients is inflated when there is multicolinearity. With a large se, it is very hard for the t-test to reject the null that the slope is zero. 
+It’s true that the $R^2$ is just a shade higher than those of the earlier regressions, but the adjusted $R^2$ is a shade lower than that of the regression on egg weight alone.
+To summarize: if you use predictors that are highly correlated with each other, don’t try to interpret results for individual slopes. Better still, don’t use predictor variables that are highly correlated with each other!
+
+## part d
+
+The two in a are the best. I don’t find anything else that compares well. If you use a combination of egg weight and either of the other two variables, the only significant slope is that of egg weight and the R2 are all around 0.7. So, for comprehensibility of the model and minimal correlation between predictors, I’d go with the two in a.
+
+#problem 10C
+
+##part a
+
+Our data is:
+```{r}
+df <- read.table("/Users/Adam/Desktop/Stat135_F17/hw10/hw10soln/tox.txt",header = TRUE)
+df
+```
+
+You can do the parametric test of the null hypothesis that in the population the mean baseline score is the same as the mean 15-month score (i.e. the treatment did nothing). The data are paired, so you run the t-test on the differences between the scores to see that the value of t is −6.15 (15months - base) with 21 degrees of freedom. The p-value is tiny so you conclude that the means are different. Notice the negative sign of t. This is coming from the fact that the 15-month scores are on average lower than the baseline scores.
+To run the nonparametric test of the null hypothesis that the underlying distributions at baseline and at 15 months are the same, do the Wilcoxon signed-rank test. The value of the statistic is 246 and the p-value is tiny, supporting the alternative that the two underlying distributions are different. This is consistent with the result of the parametric test.
+
+## part b
+
+```{r}
+cor(df)
+```
+A glance at the correlation matrix shows that you’ll want to include the baseline score (big surprise) and chemo (it’s correlated with the response but almost uncorrelated with baseline). You may want to use height, but that’s correlated with the baseline measurement so it may not be a good idea. And indeed, it turns out not to be a good idea when you run the regression.
+The best one uses baseline and chemo as the predictors; the adjusted R2 is about 0.43, clearly greater than the values from the other regressions. Both slopes are significantly different from 0. According to the diagnostic plots the model looks OK, though there are clearly some deviations from homoscedasticity and normality.
+
+#problem 4
+
+##part a
+
+The data:
+
+```{r}
+df <- read.table("/Users/Adam/Desktop/Stat135_F17/hw10/hw10soln/baby.txt",header = TRUE)
+head(df)
+```
+
+
+```{r}
+df %>% ggplot(aes(x=bw,y=..density..)) + geom_histogram(bins=10)
+```
+
+```{r}
+qqnorm(df$bw)
+```
+
+Looks about as normal as a real dataset gets. The histogram has a fairly symmetric bell shape and the normal q-q plot looks like a straight line.
+
+##part b
+
+```{r}
+df %>% ggplot(aes(x=mpw,y=..density..)) + geom_histogram(bins=10)
+```
+
+```{r}
+qqnorm(df$mpw)
+```
+
+This distribution is skewed to the right. In the q-q plot this is represented by the bow shape of the line. If the skewness was in the other direction, the q-q plot would again be bow-shaped but this time it would be concave instead of convex.
+
+## part c
+
+```{r,include=TRUE}
+cor(df)
+```
+
+```{r}
+reg <- lm(df$bw~df$gd+df$ma+df$mh+df$mpw+df$sm)
+summary(reg)
+```
+
+```{r}
+reg <- lm(df$bw~df$gd+df$mh+df$mpw+df$sm)
+summary(reg)
+```
+
+```{r}
+reg <- lm(df$bw~df$gd+df$mh+df$sm)
+summary(reg)
+```
+
+The mother’s age doesn’t seem to matter. The model which includes all the other predictors looks good; even better, you can drop the column of the mother’s pregnancy weight without much loss. In both cases the adjusted $R^2$ are around 0.25, clearly better than the others, and the diagnostic plots are pretty good.
+
+##part d
+
+The coefficient is estimated as −8.35 or (or −8.5, depending on which model you used; it doesn’t make much difference). It represents the average difference in birthweight between a baby born to a smoker and a baby born to a nonsmoker, provided the other variables included in the model are held constant. The conclusion is that a mother who smokes is expected to have a baby whose birthweight is 8.35 ounces less than a mother who doesn’t smoke (ceterus paribus - all else assumed to be equal).
+
+
+
+# problem 10E
+
+##part a
+
+R = 0.9955. If you just plot the data, the fit appears to be very good. R2 is very high and the slope is highly significant. However, the residual plot is u-shaped, showing a strong non-linear pattern. So, regardless of the high R2, we should not have fit a straight line.
+
+##part b
+
+Less. Each point in the dataset women represents many women – all those of a given height. If you replace the point by the individual points for all the women at that height, the picture will become much more fuzzy. And the correlation will drop.
+
+## part c
+
+The residual plot of the linear regression suggests a polynomial fit of degree 2. However, once that model is fitted, you can see a clear up-and-down pattern in the residuals. Try a final model, then, of degree 3. $R^2$ for this model equals 0.9998 which is ridiculously high. The residual plot is better than the previous two, though the normal q-q plot of the residuals is not as good as the one in the quadratic fit.
+I won’t go to the 4th degree polynomial for several reasons, chief among them being that you don’t gain much as far as the fit goes, and fourth powers of inches are beyond most people’s comprehensions. Stick with the cubic.
+
+# problem 10F (Rice 14.52)
+
+##part a
+
+The data:
+
+```{r}
+df <- read.csv("/Users/Adam/Desktop/Stat135_F17/hw10/hw10soln/bodytemp.csv")
+head(df)
+```
+
+The plots are very similar and neither shows any clear relationship, linear or otherwise. Both appear to be formless blobs.
+
+##part b
+Similar except that the men’s heart rates are clearly less variable than the women’s.
+
+##part c
+
+The regression confirms what we saw in a – there’s nothing much going on in terms of a linear relationship. R2 is only about 0.04. The residual plot is formless blob, which is good, but then so is the original plot. The estimated slope is 1.645 (not significantly different from 0, big surprise), and the estimated intercept is −87.967.
+
+##part d
+
+The story for the women is pretty much the same as that for the men except that R2 is higher (about 0.08) and the slope does come out to be significant. It’s positive, so the estimated heart rate increases slightly with increasing temperature. But it’s not a very convincing regression because its predictive power is pretty small due to the small R2.
+
+## part e
+
+The slope for the men was estimated as 1.645 with an SE of 1.039, and the slope for the women was estimated as 3.128 with an SE of 1.316. So the difference in slopes (women - men)
+is estimated to be 1.483 with an SE of $\sqrt{1.039^2+1.316^2}=1.68$, since the data fro the men and women are independent. The sample sizes are large enough that I’m just going to use the normal approximation and not worry about t distributions. An approximate 95%-confidence interval for the difference between the slopes is $1.483 \pm 2 × 1.68$ which clearly contains 0. So at the $5\%$ level you can conclude that the slopes are equal. 
+
+## part f
+
+Play the same game as in e but with the intercepts. The estimated difference is 145.657 with an SE of 164.767, and the 95\%-confidence interval for the difference clearly contains 0. So at the 5\% level you can conclude that the intercepts are equal.
+
+
+

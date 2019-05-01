@@ -1,0 +1,2 @@
+"0","df <- read.table(""/Users/mac/Downloads/hw/hw10/chicks.txt"",header = TRUE)"
+"0","head(df)"

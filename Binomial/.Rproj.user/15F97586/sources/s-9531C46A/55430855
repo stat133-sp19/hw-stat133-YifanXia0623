@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556651398950.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "55430855",
+    "lastKnownWriteTime" : 1556651796,
+    "last_content_update" : 1556651796094,
+    "path" : "~/Downloads/hw/hw10/hw10soln.Rmd",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "1,19",
+        "scrollLine" : "12"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556407293877.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3874141",
+    "id" : "24436CA1",
+    "lastKnownWriteTime" : 1556663345,
+    "last_content_update" : 1556663345606,
+    "path" : "~/Desktop/Binomial/R/Function.R",
+    "project_path" : "R/Function.R",
+    "properties" : {
+        "cursorPosition" : "264,63",
+        "scrollLine" : "256"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
