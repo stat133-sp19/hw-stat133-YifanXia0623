@@ -29,13 +29,13 @@ development version from GitHub:
 ```{r}
 install.packages("devtools") 
 ```
-install "cointoss" (without vignettes)
+install "Binomial" (without vignettes)
 ```{r}
-devtools::install_github("gastonstat/cointoss")
+devtools::install_github("hw-stat133-YifanXia0623/Binomial")
 ```
-install "cointoss" (with vignettes)
+install "Binomial" (with vignettes)
 ```{r}
-devtools::install_github("gastonstat/cointoss", build_vignettes = TRUE)
+devtools::install_github("hw-stat133-YifanXia0623/Binomial", build_vignettes = TRUE)
 ```
 
 
