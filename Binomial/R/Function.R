@@ -20,7 +20,7 @@ check_prob <- function(prob){
 # Param: trials  The trials that we check whether is valid
 # Return: A logical vector of whether prob is a valid probability
 check_trials <- function(trials){
-  if((trials >= 0) & (trials%%1 == 0 )){
+  if((trials > 0) & (trials%%1 == 0 )){
     return(TRUE)
   }else{
     stop("invalid trials value")
@@ -49,6 +49,8 @@ check_success <- function(success,trials){
 #examples
 #aux_mean(10, 0.3)
 aux_mean <- function(trials, prob){
+  check_trials(trials)
+  check_prob(prob)
   return(trials*prob)
 }
 
@@ -62,6 +64,8 @@ aux_mean <- function(trials, prob){
 #examples
 #aux_variance(10, 0.3)
 aux_variance <- function(trials, prob){
+  check_trials(trials)
+  check_prob(prob)
   return(trials*prob*(1-prob))
 }
 
@@ -98,6 +102,8 @@ aux_mode <- function(trials,prob){
 #examples
 #aux_skewness(10, 0.3)
 aux_skewness <- function(trials, prob){
+  check_trials(trials)
+  check_prob(prob)
   skewness = (1-2*prob)/sqrt(trials * prob * (1- prob))
   return(skewness)
 }
@@ -111,6 +117,8 @@ aux_skewness <- function(trials, prob){
 #examples
 #aux_kurtosis(10, 0.3)
 aux_kurtosis <- function(trials, prob){
+  check_trials(trials)
+  check_prob(prob)
   kurtosis= (1 - 6 * prob * (1-prob) )/(trials * prob * (1-prob))
   return(kurtosis)
 }
@@ -128,10 +136,10 @@ aux_kurtosis <- function(trials, prob){
 # bin_choose(5,1:3)
 #' @export
 bin_choose <- function(trials,success){
-  if(success>trials){
-    stop("success cannot be greater than n")
-  }else{
+  if(check_success(k,n)){
     return(factorial(trials)/(factorial(success)*factorial(trials-success)))
+  }else{
+    stop("success cannot be greater than n")
   }
 }
 
@@ -159,7 +167,7 @@ bin_probability <- function(success, trials, prob){
     bin_choose(trials, success)*(prob^(success))*((1-prob)^(trials-success))
   }
 }
-bin_probability(success=2,trials=6,prob=0.5)
+
 
 #1.5)Function bin_distribution()
 
@@ -343,7 +351,7 @@ bin_skewness <- function(trials, prob) {
 #' @description Calculates the kurtosis of a binomial variable
 #' @param trials number of trials
 #' @param prob success rate of each trials
-#' @return Return the kurtosis of binomial distribution
+#' @return Return the kurtosis of the binomial distribution
 #' @export
 #' @examples
 #' bin_kurtosis(trials = 5, prob = 0.5)
