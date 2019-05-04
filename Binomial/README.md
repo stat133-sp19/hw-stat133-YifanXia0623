@@ -10,7 +10,7 @@ The package `"Binomial"` is a minimal implementation for calculating the probabi
 * `plot.bindis(table)` draw barplot of the distribution table
 * `bin_cumulative(trials, prob)` gives us cumulative binomial distribution of all possible number of success
 * `plot.bincum(table)`gives us a line diagram showing the trend of probability change
-* `bin_variable()` outputs a list, listing number of trials and probability that the user set 
+* `bin_variable()` outputs a list, listing number of trials and probability that the user set
 * `summary.binvar()` output a list listing number of trials, probability, mean, variance, mode, skewness, and kurtosis
 * `print.binvar()` display the result of `bin_variable()`
 * `print.summary.binvar()` display the result of `summary.binvar()`
@@ -25,17 +25,17 @@ This package has been developed to the calculate data and plot result of a binom
 
 Install the development version from GitHub via the package `"devtools"`:
 
-development version from GitHub: 
+development version from GitHub:
 ```{r}
-install.packages("devtools") 
+install.packages("devtools")
 ```
 install "Binomial" (without vignettes)
 ```{r}
-devtools::install_github("hw-stat133-YifanXia0623/Binomial")
+devtools::install_github("stat133-sp19/hw-stat133-YifanXia0623/Binomial")
 ```
 install "Binomial" (with vignettes)
 ```{r}
-devtools::install_github("hw-stat133-YifanXia0623/Binomial", build_vignettes = TRUE)
+devtools::install_github("stat133-sp19/hw-stat133-YifanXia0623/Binomial", build_vignettes = TRUE)
 ```
 
 
