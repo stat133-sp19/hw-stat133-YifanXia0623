@@ -31,7 +31,7 @@ install.packages("devtools")
 ```
 install "Binomial" (without vignettes)
 ```{r}
-devtools::install_github("stat133-sp19/hw-stat133-YifanXia0623/Binomial")
+devtools::install_github("stat133-sp19/hw-stat133-YifanXia0623/Binomial",force = TRUE)
 ```
 install "Binomial" (with vignettes)
 ```{r}
